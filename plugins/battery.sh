@@ -8,11 +8,8 @@ HEART_EMPTY="♡"
 
 run_plugin() {
 	__process_settings
-	if shell_is_osx; then
-		battery_status=$(__battery_osx)
-	else
-		battery_status=$(__battery_linux)
-	fi
+	battery_status=$(__battery_linux)
+
 	[ -z "$battery_status" ] && return
 
 	case "$POWERTMUX_SEG_BATTERY_TYPE" in
@@ -35,40 +32,6 @@ __process_settings() {
 		export POWERTMUX_SEG_BATTERY_NUM_HEARTS="${POWERTMUX_SEG_BATTERY_NUM_HEARTS_DEFAULT}"
 	fi
 }
-
-__battery_osx() {
-	ioreg -c AppleSmartBattery -w0 | \
-		grep -o '"[^"]*" = [^ ]*' | \
-		sed -e 's/= //g' -e 's/"//g' | \
-		sort | \
-		while read key value; do
-			case $key in
-				"MaxCapacity")
-					export maxcap=$value;;
-				"CurrentCapacity")
-					export curcap=$value;;
-				"ExternalConnected")
-					export extconnect=$value;;
-        "FullyCharged")
-          export fully_charged=$value;;
-			esac
-			if [[ -n $maxcap && -n $curcap && -n $extconnect ]]; then
-				if [[ "$curcap" == "$maxcap" || "$fully_charged" == "Yes" && $extconnect == "Yes"  ]]; then
-					return
-				fi
-				charge=$(( 100 * $curcap / $maxcap ))
-				if [[ "$extconnect" == "Yes" ]]; then
-					echo "$charge"
-				else
-					if [[ $charge -lt 50 ]]; then
-						echo -n "#[fg=red]"
-					fi
-					echo "$charge"
-				fi
-				break
-			fi
-		done
-	}
 
 	__battery_linux() {
 		case "$SHELL_PLATFORM" in
