@@ -5,16 +5,7 @@ run_plugin() {
   local wan_ip
 
   if [ -f "$tmp_file" ]; then
-    if shell_is_osx || shell_is_bsd; then
-      stat >/dev/null 2>&1 && is_gnu_stat=false || is_gnu_stat=true
-      if [ "$is_gnu_stat" == "true" ];then
-        last_update=$(stat -c "%Y" ${tmp_file})
-      else
-        last_update=$(stat -f "%m" ${tmp_file})
-      fi
-    elif shell_is_linux || [ -z $is_gnu_stat]; then
-      last_update=$(stat -c "%Y" ${tmp_file})
-    fi
+    last_update=$(stat -c "%Y" ${tmp_file})
 
     time_now=$(date +%s)
     update_period=900
