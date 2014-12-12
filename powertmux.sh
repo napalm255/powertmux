@@ -137,7 +137,7 @@ __powertmux_process() {
     local separator_background_color=${powertmux_plugin[4]}
     local separator_foreground_color=${powertmux_plugin[5]}
 
-    eval "__print_${side}_plugin ${plugin_index} ${background_color} ${foreground_color} ${separator} ${separator_background_color} ${separator_foreground_color}"
+    eval "__print_plugin ${side} ${plugin_index} ${background_color} ${foreground_color} ${separator} ${separator_background_color} ${separator_foreground_color}"
   done
 }
 
@@ -147,28 +147,25 @@ __print_colored_content() {
   echo -n "#[default]"
 }
 
-__print_left_plugin() {
-  local content=${powertmux_plugin_contents[$1]}
-  local content_background_color=$2
-  local content_foreground_color=$3
-  local separator=$4
-  local separator_background_color=$5
-  local separator_foreground_color=$6
+__print_plugin() {
+  local side=$1
+  local content=${powertmux_plugin_contents[$2]}
+  local content_background_color=$3
+  local content_foreground_color=$4
+  local separator=$5
+  local separator_background_color=$6
+  local separator_foreground_color=$7
 
-  __print_colored_content "$content" $content_background_color $content_foreground_color
-  __print_colored_content $separator $separator_background_color $separator_foreground_color
-}
-
-__print_right_plugin() {
-  local content=${powertmux_plugin_contents[$1]}
-  local content_background_color=$2
-  local content_foreground_color=$3
-  local separator=$4
-  local separator_background_color=$5
-  local separator_foreground_color=$6
-  
-  __print_colored_content $separator $separator_background_color $separator_foreground_color
-  __print_colored_content "$content" $content_background_color $content_foreground_color
+  case "${side}" in
+    left)
+      __print_colored_content "$content" $content_background_color $content_foreground_color
+      __print_colored_content $separator $separator_background_color $separator_foreground_color
+    ;;
+    right)
+      __print_colored_content $separator $separator_background_color $separator_foreground_color
+      __print_colored_content "$content" $content_background_color $content_foreground_color
+    ;;
+  esac
 }
 
 __plugin_separator_is_thin() {
