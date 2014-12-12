@@ -1,5 +1,3 @@
-# LICENSE This code is not under the same license as the rest of the project as it's "stolen". It's cloned from https://github.com/richoH/dotfiles/blob/master/bin/battery and just some modifications are done so it works for my laptop. Check that URL for more recent versions.
-
 POWERTMUX_SEG_BATTERY_TYPE_DEFAULT="percentage"
 POWERTMUX_SEG_BATTERY_NUM_HEARTS_DEFAULT=5
 
