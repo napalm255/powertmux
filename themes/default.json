@@ -1,0 +1,34 @@
+{
+  "default colors": {
+    "background": "236",
+    "foreground": "255"
+  },
+  "left": {
+    "display": "on",
+    "separators": {
+      "left-bold": "◀",
+      "left-thin": "❮",
+      "left-side": "right-bold"
+    },
+    "plugins": {
+      "lan_ip": "239 255",
+      "wan_ip": "239 255 left-thin",
+      "battery": "137 127",
+      "datetime": "252 0"
+    }
+  },
+  "right": {
+    "display": "on",
+    "separators": {
+      "right-bold": "▶",
+      "right-thin": "❯",
+      "left-side": "left-bold"
+    },
+    "plugins": {
+      "lan_ip": "239 255",
+      "wan_ip": "239 255 left-thin",
+      "battery": "137 127",
+      "datetime": "252 0"
+    }
+  }
+}
