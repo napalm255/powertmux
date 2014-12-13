@@ -1,4 +1,5 @@
-export POWERTMUX_DIR_HOME="$(dirname $0)"
+#export POWERTMUX_DIR_HOME="$(dirname $0)"
+export POWERTMUX_DIR_HOME="/opt/git/powertmux"
 export POWERTMUX_DIR_PLUGINS="$POWERTMUX_DIR_HOME/plugins"
 export POWERTMUX_DIR_TEMPORARY="/tmp/powertmux_${USER}"
 export POWERTMUX_DIR_THEMES="$POWERTMUX_DIR_HOME/themes"
@@ -8,6 +9,10 @@ export POWERTMUX_STATUS_LEFT="on"
 export POWERTMUX_STATUS_RIGHT="on"
 
 [ ! -d "$POWERTMUX_DIR_TEMPORARY" ] && mkdir "$POWERTMUX_DIR_TEMPORARY"
+
+powertmux() {
+  __powertmux_display $@
+}
 
 __powertmux_display() {
   case "${1}" in
@@ -252,7 +257,3 @@ get_tmux_cwd() {
     echo "$tmux_pwd"
   fi
 }
-
-__powertmux_display $@
-
-exit 0

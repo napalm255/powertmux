@@ -12,11 +12,7 @@ run_plugin() {
   __process_settings
   local opts=""
   if [ "$POWERTMUX_SEG_HOSTNAME_FORMAT" == "short" ]; then
-    if shell_is_osx || shell_is_bsd; then
-      opts="-s"
-    else
-      opts="--short"
-    fi
+    opts="--short"
   fi
   hostname ${opts}
   return 0
