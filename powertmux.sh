@@ -120,7 +120,7 @@ __powertmux_colors() {
       powertmux_plugin[4]=${previous_background_color:-$POWERTMUX_DEFAULT_BACKGROUND_COLOR}
     fi
 
-    if __plugin_separator_is_thin; then
+    if __powertmux_plugin_separator_is_thin; then
       powertmux_plugin[5]=${powertmux_plugin[2]}
     else
       powertmux_plugin[5]=${powertmux_plugin[1]}
@@ -142,41 +142,38 @@ __powertmux_process() {
     local separator_background_color=${powertmux_plugin[4]}
     local separator_foreground_color=${powertmux_plugin[5]}
 
-    eval "__print_${side}_plugin ${plugin_index} ${background_color} ${foreground_color} ${separator} ${separator_background_color} ${separator_foreground_color}"
+    eval "__powertmux_print_plugin ${side} ${plugin_index} ${background_color} ${foreground_color} ${separator} ${separator_background_color} ${separator_foreground_color}"
   done
 }
 
-__print_colored_content() {
+__powertmux_print_colored_content() {
   echo -n "#[fg=colour$3, bg=colour$2]"
   echo -n "$1"
   echo -n "#[default]"
 }
 
-__print_left_plugin() {
-  local content=${powertmux_plugin_contents[$1]}
-  local content_background_color=$2
-  local content_foreground_color=$3
-  local separator=$4
-  local separator_background_color=$5
-  local separator_foreground_color=$6
+__powertmux_print_plugin() {
+  local side=$1
+  local content=${powertmux_plugin_contents[$2]}
+  local content_background_color=$3
+  local content_foreground_color=$4
+  local separator=$5
+  local separator_background_color=$6
+  local separator_foreground_color=$7
 
-  __print_colored_content "$content" $content_background_color $content_foreground_color
-  __print_colored_content $separator $separator_background_color $separator_foreground_color
+  case "${side}" in
+    left)
+      __powertmux_print_colored_content "$content" $content_background_color $content_foreground_color
+      __powertmux_print_colored_content $separator $separator_background_color $separator_foreground_color
+    ;;
+    right)
+      __powertmux_print_colored_content $separator $separator_background_color $separator_foreground_color
+      __powertmux_print_colored_content "$content" $content_background_color $content_foreground_color
+    ;;
+  esac
 }
 
-__print_right_plugin() {
-  local content=${powertmux_plugin_contents[$1]}
-  local content_background_color=$2
-  local content_foreground_color=$3
-  local separator=$4
-  local separator_background_color=$5
-  local separator_foreground_color=$6
-  
-  __print_colored_content $separator $separator_background_color $separator_foreground_color
-  __print_colored_content "$content" $content_background_color $content_foreground_color
-}
-
-__plugin_separator_is_thin() {
+__powertmux_plugin_separator_is_thin() {
   [[ ${powertmux_plugin[3]} == $POWERTMUX_SEPARATOR_LEFT_THIN || \
     ${powertmux_plugin[3]} == $POWERTMUX_SEPARATOR_RIGHT_THIN ]];
 }
@@ -246,14 +243,14 @@ roll_text() {
 }
 
 # Get the current path in the plugin.
-get_tmux_cwd() {
-  local env_name=$(tmux display -p "TMUXPWD_#D" | tr -d %)
-  local env_val=$(tmux show-environment | grep --color=never "$env_name")
-  # The version below is still quite new for tmux. Uncomment this in the future :-)
-  #local env_val=$(tmux show-environment "$env_name" 2>&1)
-
-  if [[ ! $env_val =~ "unknown variable" ]]; then
-    local tmux_pwd=$(echo "$env_val" | sed 's/^.*=//')
-    echo "$tmux_pwd"
-  fi
-}
+#get_tmux_cwd() {
+#  local env_name=$(tmux display -p "TMUXPWD_#D" | tr -d %)
+#  local env_val=$(tmux show-environment | grep --color=never "$env_name")
+#  # The version below is still quite new for tmux. Uncomment this in the future :-)
+#  #local env_val=$(tmux show-environment "$env_name" 2>&1)
+#
+#  if [[ ! $env_val =~ "unknown variable" ]]; then
+#    local tmux_pwd=$(echo "$env_val" | sed 's/^.*=//')
+#    echo "$tmux_pwd"
+#  fi
+#}
