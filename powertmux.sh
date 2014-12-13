@@ -44,7 +44,7 @@ __powertmux_complete() {
   COMPREPLY=( $(compgen -W "${option_list}" -- ${cur}) )
 }
 
-__powertmux_directory() {
+__powertmux_dir_home() {
   SOURCE="${BASH_SOURCE[0]}"
   while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
     DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -265,10 +265,10 @@ roll_text() {
 }
 
 # configure variables
-export POWERTMUX_DIR_HOME="$(__powertmux_directory)"
-export POWERTMUX_DIR_PLUGINS="${POWERTMUX_DIR_HOME}/plugins"
+export POWERTMUX_DIR_HOME="$(__powertmux_dir_home)"
+export POWERTMUX_DIR_LIB="${POWERTMUX_DIR_HOME}/lib"
 export POWERTMUX_DIR_THEMES="${POWERTMUX_DIR_HOME}/themes"
-export POWERTMUX_DIR_TMUX="${POWERTMUX_DIR_HOME}/tmux.conf"
+export POWERTMUX_DIR_PLUGINS="${POWERTMUX_DIR_HOME}/plugins"
 export POWERTMUX_DIR_TEMPORARY="/tmp/powertmux_${USER}"
 export POWERTMUX_THEME_DEFAULT="default"
 export POWERTMUX_STATUS_LEFT="on"
