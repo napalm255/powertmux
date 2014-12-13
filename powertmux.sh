@@ -1,35 +1,57 @@
-#export POWERTMUX_DIR_HOME="$(dirname $0)"
-export POWERTMUX_DIR_HOME="/opt/git/powertmux"
-export POWERTMUX_DIR_PLUGINS="$POWERTMUX_DIR_HOME/plugins"
-export POWERTMUX_DIR_TEMPORARY="/tmp/powertmux_${USER}"
-export POWERTMUX_DIR_THEMES="$POWERTMUX_DIR_HOME/themes"
-export POWERTMUX_THEME_DEFAULT="default"
-
-export POWERTMUX_STATUS_LEFT="on"
-export POWERTMUX_STATUS_RIGHT="on"
-
-[ ! -d "$POWERTMUX_DIR_TEMPORARY" ] && mkdir "$POWERTMUX_DIR_TEMPORARY"
+#!/usr/bin/env bash
 
 powertmux() {
-  __powertmux_display $@
-}
-
-__powertmux_display() {
-  case "${1}" in
-    left|right)
-      case "${2}" in
-        on|off) tmux set-env "POWERTMUX_STATUS_${1^^}" "$2" ;;
-        status) [ "$(tmux show-env POWERTMUX_STATUS_${1^^} | sed 's:^.*=::')" == "on" ] && return 0 || return 1 ;;
-        show)
-          [ "$(tmux show-env POWERTMUX_STATUS_${1^^} | sed 's:^.*=::')" == "off" ] && return 0 
-          [ "$(tmux list-clients -F '#{client_width}')" -lt 100 ] && [ "${1,,}" == "right" ] && return 0
-          [ "$(tmux list-clients -F '#{client_width}')" -lt 50 ] && return 0
-          __powertmux_settings
-          __powertmux_print "${1}"
+  case "${1,,}" in
+    status)
+      case "${2,,}" in
+        left|right)
+          case "${3,,}" in
+            on|off) tmux set-env "POWERTMUX_STATUS_${2^^}" "$3" ;;
+            show)
+              [ "$(tmux show-env POWERTMUX_STATUS_${2^^} | sed 's:^.*=::')" == "off" ] && return 0 
+              [ "$(tmux list-clients -F '#{client_width}')" -lt 100 ] && [ "${2,,}" == "right" ] && return 0
+              [ "$(tmux list-clients -F '#{client_width}')" -lt 50 ] && return 0
+              __powertmux_settings
+              __powertmux_print "${2}"
+            ;;
+          esac
         ;;
       esac
     ;;
   esac
+}
+
+__powertmux_complete() {
+  local cur prev option_list
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+  if [ $COMP_CWORD -eq 1 ]; then
+    # first level options
+    option_list="status"
+  elif [ $COMP_CWORD -eq 2 ]; then
+    # second level options
+    case "${prev}" in
+      status) option_list="left right" ;;
+    esac
+  elif [ $COMP_CWORD -eq 3 ]; then
+    # third level options
+    case "${prev}" in
+      left|right) option_list="on off" ;;
+    esac
+  fi
+  COMPREPLY=( $(compgen -W "${option_list}" -- ${cur}) )
+}
+
+__powertmux_directory() {
+  SOURCE="${BASH_SOURCE[0]}"
+  while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  done
+  echo "$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 }
 
 __powertmux_settings() {
@@ -242,15 +264,20 @@ roll_text() {
   echo "${text}"
 }
 
-# Get the current path in the plugin.
-#get_tmux_cwd() {
-#  local env_name=$(tmux display -p "TMUXPWD_#D" | tr -d %)
-#  local env_val=$(tmux show-environment | grep --color=never "$env_name")
-#  # The version below is still quite new for tmux. Uncomment this in the future :-)
-#  #local env_val=$(tmux show-environment "$env_name" 2>&1)
-#
-#  if [[ ! $env_val =~ "unknown variable" ]]; then
-#    local tmux_pwd=$(echo "$env_val" | sed 's/^.*=//')
-#    echo "$tmux_pwd"
-#  fi
-#}
+# configure variables
+export POWERTMUX_DIR_HOME="$(__powertmux_directory)"
+export POWERTMUX_DIR_PLUGINS="${POWERTMUX_DIR_HOME}/plugins"
+export POWERTMUX_DIR_THEMES="${POWERTMUX_DIR_HOME}/themes"
+export POWERTMUX_DIR_TMUX="${POWERTMUX_DIR_HOME}/tmux.conf"
+export POWERTMUX_DIR_TEMPORARY="/tmp/powertmux_${USER}"
+export POWERTMUX_THEME_DEFAULT="default"
+export POWERTMUX_STATUS_LEFT="on"
+export POWERTMUX_STATUS_RIGHT="on"
+
+[ ! -d "$POWERTMUX_DIR_TEMPORARY" ] && mkdir "$POWERTMUX_DIR_TEMPORARY"
+
+# load powertmux
+powertmux $@
+
+# enable auto completion
+complete -F __powertmux_complete powertmux
