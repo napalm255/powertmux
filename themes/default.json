@@ -31,7 +31,7 @@
     "plugins": [
       "lan_ip 239 255",
       "wan_ip 239 255 left_thin",
-      "battery 137 127",
+      "battery 245 196",
       "datetime 252 0"
     ]
   }
