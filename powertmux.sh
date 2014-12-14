@@ -242,7 +242,7 @@ export POWERTMUX_DIR_TEMPORARY="/tmp/powertmux_${USER}"
 [ ! -d "$POWERTMUX_DIR_TEMPORARY" ] && mkdir "$POWERTMUX_DIR_TEMPORARY"
 
 # load powertmux
-powertmux $@
+[ -z "$@" ] || powertmux $@
 
 # enable auto completion
 complete -F __powertmux_complete powertmux
