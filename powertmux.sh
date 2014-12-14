@@ -60,15 +60,16 @@ __powertmux_dir_home() {
 }
 
 __powertmux_settings() {
+  [ "$(tmux show-env POWERTMUX_THEME | sed 's:^.*=::')" == "" ] && tmux set-env "POWERTMUX_THEME" "default"
   POWERTMUX_THEME=$(tmux show-env POWERTMUX_THEME | sed 's:^.*=::')
 
   # read json using lib/jq
   local jq=${POWERTMUX_DIR_LIB}/jq
   local js=${POWERTMUX_DIR_THEMES}/${POWERTMUX_THEME}.json
 
-  tmux set-env "POWERTMUX_STATUS_LEFT" "$($jq ".left.display" $js)"
-  tmux set-env "POWERTMUX_STATUS_RIGHT" "$($jq ".right.display" $js)"
-  [ "$(tmux show-env POWERTMUX_THEME | sed 's:^.*=::')" == "" ] && tmux set-env "POWERTMUX_THEME" "default"
+  [ "$(tmux show-env POWERTMUX_STATUS_LEFT | sed 's:^.*=::')" == "" ] && tmux set-env "POWERTMUX_STATUS_LEFT" "$($jq ".left.display" $js)"
+  [ "$(tmux show-env POWERTMUX_STATUS_RIGHT | sed 's:^.*=::')" == "" ] && tmux set-env "POWERTMUX_STATUS_RIGHT" "$($jq ".right.display" $js)"
+
   POWERTMUX_SEPARATOR_LEFT_BOLD=$($jq ".left.separators.bold" $js)
   POWERTMUX_SEPARATOR_LEFT_THIN=$($jq ".left.separators.thin" $js)
   POWERTMUX_SEPARATOR_RIGHT_BOLD=$($jq ".right.separators.bold" $js)
