@@ -1,0 +1,38 @@
+{
+  "defaults": {
+    "colors": {
+      "background": "236",
+      "foreground": "255"
+    },
+    "separators": {
+      "left": "right_bold",
+      "right": "left_bold"
+    }
+  },
+  "left": {
+    "display": "off",
+    "separators": {
+      "bold": "◀",
+      "thin": "❮",
+      "test": "\u00BB"
+    },
+    "plugins": [
+      "tmux_session_info 196 255",
+      "hostname 239 255"
+    ]
+  },
+  "right": {
+    "display": "on",
+    "separators": {
+      "bold": "▶",
+      "thin": "❯",
+      "test": "\u00BB"
+    },
+    "plugins": [
+      "lan_ip 239 255",
+      "wan_ip 239 255 left_thin",
+      "battery 245 196",
+      "datetime 252 0"
+    ]
+  }
+}
