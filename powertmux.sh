@@ -55,15 +55,37 @@ __powertmux_dir_home() {
 }
 
 __powertmux_settings() {
-  [ -z "$POWERTMUX_THEME" ] && export POWERTMUX_THEME="${POWERTMUX_THEME_DEFAULT}"
+  [ -z "$POWERTMUX_THEME" ] && export POWERTMUX_THEME="default"
 
-  eval POWERTMUX_DIR_USER_PLUGINS="$POWERTMUX_DIR_USER_PLUGINS"
-  eval POWERTMUX_DIR_USER_THEMES="$POWERTMUX_DIR_USER_THEMES"
-  if [ -n "$POWERTMUX_DIR_USER_THEMES" ] && [ -f "${POWERTMUX_DIR_USER_THEMES}/${POWERTMUX_THEME}.sh" ]; then
-    source "${POWERTMUX_DIR_USER_THEMES}/${POWERTMUX_THEME}.sh"
-  else
-    source "${POWERTMUX_DIR_THEMES}/${POWERTMUX_THEME}.sh"
-  fi
+  # read json using lib/jq
+  local jq=${POWERTMUX_DIR_LIB}/jq
+  local js=${POWERTMUX_DIR_THEMES}/${POWERTMUX_THEME}.json
+  local old=${POWERTMUX_DIR_THEMES}/${POWERTMUX_THEME}.sh
+
+  tmux set-env "POWERTMUX_STATUS_LEFT" "$($jq ".left.display" $js)"
+  tmux set-env "POWERTMUX_STATUS_RIGHT" "$($jq ".right.display" $js)"
+  POWERTMUX_SEPARATOR_LEFT_BOLD=$($jq ".left.separators.bold" $js)
+  POWERTMUX_SEPARATOR_LEFT_THIN=$($jq ".left.separators.thin" $js)
+  POWERTMUX_SEPARATOR_RIGHT_BOLD=$($jq ".right.separators.bold" $js)
+  POWERTMUX_SEPARATOR_RIGHT_THIN=$($jq ".left.separators.thin" $js)
+  POWERTMUX_DEFAULT_BACKGROUND_COLOR=$($jq ".defaults.colors.background" $js)
+  POWERTMUX_DEFAULT_FOREGROUND_COLOR=$($jq ".defaults.colors.foreground" $js)
+  POWERTMUX_DEFAULT_LEFTSIDE_SEPARATOR=$($jq ".defaults.separators.left" $js | tr '[:lower:]' '[:upper:]' | sed -e 's/\"//g')
+  POWERTMUX_DEFAULT_RIGHTSIDE_SEPARATOR=$($jq ".defaults.separators.right" $js | tr '[:lower:]' '[:upper:]' | sed -e 's/\"//g')
+  POWERTMUX_DEFAULT_LEFTSIDE_SEPARATOR=$(eval "echo \$$(echo POWERTMUX_SEPARATOR_$(echo ${POWERTMUX_DEFAULT_LEFTSIDE_SEPARATOR}))")
+  POWERTMUX_DEFAULT_RIGHTSIDE_SEPARATOR=$(eval "echo \$$(echo POWERTMUX_SEPARATOR_$(echo ${POWERTMUX_DEFAULT_RIGHTSIDE_SEPARATOR}))")
+
+  PLUGINS=($($jq ".left.plugins[]" $js | sed -e 's/\ /,/g' ))
+  for ((i = 0; i < ${#PLUGINS[@]}; i++))
+  do
+    POWERTMUX_LEFT_STATUS_PLUGINS[${i}]=$(echo "${PLUGINS[$i]}" | sed -e 's/,/ /g' -e 's/\"//g')
+  done
+  PLUGINS=($($jq ".right.plugins[]" $js | sed -e 's/\ /,/g' ))
+  for ((i = 0; i < ${#PLUGINS[@]}; i++))
+  do
+    POWERTMUX_RIGHT_STATUS_PLUGINS[${i}]=$(echo "${PLUGINS[$i]}" | sed -e 's/,/ /g' -e 's/\"//g')
+  done
+
 }
 
 __powertmux_print() {
@@ -264,15 +286,15 @@ roll_text() {
   echo "${text}"
 }
 
+# clear all variables
+unset $(env | grep POWERTMUX | sed -e 's/=.*//g')
+
 # configure variables
 export POWERTMUX_DIR_HOME="$(__powertmux_dir_home)"
 export POWERTMUX_DIR_LIB="${POWERTMUX_DIR_HOME}/lib"
 export POWERTMUX_DIR_THEMES="${POWERTMUX_DIR_HOME}/themes"
 export POWERTMUX_DIR_PLUGINS="${POWERTMUX_DIR_HOME}/plugins"
 export POWERTMUX_DIR_TEMPORARY="/tmp/powertmux_${USER}"
-export POWERTMUX_THEME_DEFAULT="default"
-export POWERTMUX_STATUS_LEFT="on"
-export POWERTMUX_STATUS_RIGHT="on"
 
 [ ! -d "$POWERTMUX_DIR_TEMPORARY" ] && mkdir "$POWERTMUX_DIR_TEMPORARY"
 

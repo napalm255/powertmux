@@ -1,34 +1,38 @@
 {
-  "default colors": {
-    "background": "236",
-    "foreground": "255"
+  "defaults": {
+    "colors": {
+      "background": "236",
+      "foreground": "255"
+    },
+    "separators": {
+      "left": "right_bold",
+      "right": "left_bold"
+    }
   },
   "left": {
-    "display": "on",
+    "display": "off",
     "separators": {
-      "left-bold": "◀",
-      "left-thin": "❮",
-      "left-side": "right-bold"
+      "bold": "◀",
+      "thin": "❮",
+      "test": "\u00BB"
     },
-    "plugins": {
-      "lan_ip": "239 255",
-      "wan_ip": "239 255 left-thin",
-      "battery": "137 127",
-      "datetime": "252 0"
-    }
+    "plugins": [
+      "tmux_session_info 252 0",
+      "hostname 239 255"
+    ]
   },
   "right": {
     "display": "on",
     "separators": {
-      "right-bold": "▶",
-      "right-thin": "❯",
-      "left-side": "left-bold"
+      "bold": "▶",
+      "thin": "❯",
+      "test": "\u00BB"
     },
-    "plugins": {
-      "lan_ip": "239 255",
-      "wan_ip": "239 255 left-thin",
-      "battery": "137 127",
-      "datetime": "252 0"
-    }
+    "plugins": [
+      "lan_ip 239 255",
+      "wan_ip 239 255 left_thin",
+      "battery 137 127",
+      "datetime 252 0"
+    ]
   }
 }
