@@ -18,6 +18,9 @@ powertmux() {
         ;;
       esac
     ;;
+    theme)
+      tmux set-env "POWERTMUX_THEME" "${2}"
+    ;;
   esac
 }
 
@@ -29,11 +32,12 @@ __powertmux_complete() {
 
   if [ $COMP_CWORD -eq 1 ]; then
     # first level options
-    option_list="status"
+    option_list="status theme"
   elif [ $COMP_CWORD -eq 2 ]; then
     # second level options
     case "${prev}" in
       status) option_list="left right" ;;
+       theme) option_list="$(ls $POWERTMUX_DIR_THEMES | sed -e 's/.json//g')" ;;
     esac
   elif [ $COMP_CWORD -eq 3 ]; then
     # third level options
@@ -55,15 +59,15 @@ __powertmux_dir_home() {
 }
 
 __powertmux_settings() {
-  [ -z "$POWERTMUX_THEME" ] && export POWERTMUX_THEME="default"
+  POWERTMUX_THEME=$(tmux show-env POWERTMUX_THEME | sed 's:^.*=::')
 
   # read json using lib/jq
   local jq=${POWERTMUX_DIR_LIB}/jq
   local js=${POWERTMUX_DIR_THEMES}/${POWERTMUX_THEME}.json
-  local old=${POWERTMUX_DIR_THEMES}/${POWERTMUX_THEME}.sh
 
   tmux set-env "POWERTMUX_STATUS_LEFT" "$($jq ".left.display" $js)"
   tmux set-env "POWERTMUX_STATUS_RIGHT" "$($jq ".right.display" $js)"
+  [ "$(tmux show-env POWERTMUX_THEME | sed 's:^.*=::')" == "" ] && tmux set-env "POWERTMUX_THEME" "default"
   POWERTMUX_SEPARATOR_LEFT_BOLD=$($jq ".left.separators.bold" $js)
   POWERTMUX_SEPARATOR_LEFT_THIN=$($jq ".left.separators.thin" $js)
   POWERTMUX_SEPARATOR_RIGHT_BOLD=$($jq ".right.separators.bold" $js)
@@ -103,8 +107,9 @@ __powertmux_print() {
 
 __powertmux_plugins_defaults() {
   for plugin_index in "${!input_plugins[@]}"; do
-    local input_plugin=(${input_plugins[$plugin_index]})
     eval "local default_separator=\$POWERTMUX_DEFAULT_${upper_side}SIDE_SEPARATOR"
+    local input_plugin=(${input_plugins[$plugin_index]})
+    input_plugin[3]=$(eval "echo \$$(echo POWERTMUX_SEPARATOR_$(echo ${input_plugin[3]^^}))")
 
     powertmux_plugin_with_defaults=(
       ${input_plugin[0]:-"no_script"} \
