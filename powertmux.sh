@@ -8,9 +8,10 @@ powertmux() {
           case "${3,,}" in
             on|off) tmux set-env "POWERTMUX_STATUS_${2^^}" "$3" ;;
             show)
+              local client_width=$(tmux list-clients -F '#{client_width}')
               [ "$(tmux show-env POWERTMUX_STATUS_${2^^} | sed 's:^.*=::')" == "off" ] && return 0 
-              [ "$(tmux list-clients -F '#{client_width}')" -lt 100 ] && [ "${2,,}" == "right" ] && return 0
-              [ "$(tmux list-clients -F '#{client_width}')" -lt 50 ] && return 0
+              [ "${client_width}" -lt 100 ] && [ "${2,,}" == "right" ] && return 0
+              [ "${client_width}" -lt 50 ] && return 0
               __powertmux_settings
               __powertmux_print "${2}"
             ;;
