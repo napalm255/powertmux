@@ -1,25 +1,8 @@
-# powertmux 
+powertmux
+=========
 
-# Screenshots
+### Installation
 
-# Requirements
+  For a global installation, copy `tmux.conf` to `/etc/tmux.conf`.
 
-# Plugin Requirements
-
-# Installation
-
-  * clone repository
-
-  ```
-  git clone https://github.com/napalm255/powertmux.git /path/to/repo
-  ```
-
-  * create symlinks
-
-  ```
-  sudo ln -s /path/to/repo/tmux.conf /etc/tmux.conf
-  ```
-
-# Configuration
-
-# Debugging
+  For a user level installation, copy `tmux.conf` to `~/.tmux.conf`.
